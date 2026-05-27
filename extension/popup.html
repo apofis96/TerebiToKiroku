@@ -1,8 +1,96 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YT Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
 
 <body>
-    <h1>Terebi To Kiroku</h1>
-    <script src="popup.js"></script>
+  <div class="shell">
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <span class="logo-icon">▶</span>
+        <span class="logo-text">YT TRACKER</span>
+      </div>
+      <div class="tabs">
+        <button class="tab active" data-tab="now">NOW</button>
+        <button class="tab" data-tab="history">HISTORY</button>
+      </div>
+    </header>
+
+    <!-- NOW tab -->
+    <section id="tab-now" class="tab-content active">
+      <div id="no-video" class="empty-state">
+        <div class="empty-icon">◎</div>
+        <p>No video detected.<br />Open a YouTube video to start tracking.</p>
+      </div>
+
+      <div id="video-card" class="video-card hidden">
+        <div class="now-playing-badge">
+          <span class="pulse"></span> LIVE
+        </div>
+        <p class="video-title" id="video-title">—</p>
+
+        <!-- Progress bar -->
+        <div class="progress-wrap">
+          <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+            <div class="progress-thumb" id="progress-thumb"></div>
+          </div>
+          <div class="time-row">
+            <span id="time-current">0:00</span>
+            <span id="time-duration">0:00</span>
+          </div>
+        </div>
+
+        <!-- Stats grid -->
+        <div class="stats-grid">
+          <div class="stat">
+            <span class="stat-value" id="stat-watched">0m</span>
+            <span class="stat-label">WATCHED</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="stat-progress">0%</span>
+            <span class="stat-label">PROGRESS</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="stat-remaining">—</span>
+            <span class="stat-label">REMAINING</span>
+          </div>
+        </div>
+
+        <div class="speed-info">
+          <span class="speed-label">SPEED</span>
+          <span class="speed-value" id="playback-speed">1x</span>
+        </div>
+
+        <div class="status-row">
+          <span id="status-dot" class="dot dot-pause"></span>
+          <span id="status-text">Paused</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTORY tab -->
+    <section id="tab-history" class="tab-content">
+      <div id="history-empty" class="empty-state">
+        <div class="empty-icon">◫</div>
+        <p>No history yet.<br />Watch some videos first.</p>
+      </div>
+      <ul id="history-list" class="history-list"></ul>
+      <button id="clear-history" class="clear-btn hidden">CLEAR HISTORY</button>
+    </section>
+  </div>
+
+  <script src="popup.js"></script>
 </body>
 
 </html>
