@@ -102,10 +102,19 @@ function updateNowPlaying(data, record) {
 }
 
 /* ── History ── */
+function getStorageArea() {
+  return globalThis.chrome?.storage?.local || globalThis.browser?.storage?.local || null;
+}
+
 async function renderHistory() {
-  const history = await new Promise((r) =>
-    chrome.storage.local.get(["ytTracker_history"], (d) => r(d.ytTracker_history || []))
-  );
+  const storage = getStorageArea();
+  const history = await new Promise((r) => {
+    if (!storage) {
+      r([]);
+      return;
+    }
+    storage.get(["ytTracker_history"], (d = {}) => r(d.ytTracker_history || []));
+  });
 
   if (!history.length) {
     historyEmpty.style.display = "";
@@ -119,9 +128,13 @@ async function renderHistory() {
   historyList.innerHTML = "";
 
   for (const id of history) {
-    const rec = await new Promise((r) =>
-      chrome.storage.local.get(["ytTracker_" + id], (d) => r(d["ytTracker_" + id] || null))
-    );
+    const rec = await new Promise((r) => {
+      if (!storage) {
+        r(null);
+        return;
+      }
+      storage.get(["ytTracker_" + id], (d = {}) => r(d["ytTracker_" + id] || null));
+    });
     if (!rec) continue;
 
     const pct = rec.duration ? Math.min(100, Math.round((rec.lastPosition / rec.duration) * 100)) : 0;
@@ -154,11 +167,17 @@ function escHtml(s) {
 }
 
 clearBtn.addEventListener("click", async () => {
-  const history = await new Promise((r) =>
-    chrome.storage.local.get(["ytTracker_history"], (d) => r(d.ytTracker_history || []))
-  );
+  const storage = getStorageArea();
+  const history = await new Promise((r) => {
+    if (!storage) {
+      r([]);
+      return;
+    }
+    storage.get(["ytTracker_history"], (d = {}) => r(d.ytTracker_history || []));
+  });
   const keys = history.map((id) => "ytTracker_" + id).concat(["ytTracker_history"]);
-  chrome.storage.local.remove(keys, renderHistory);
+  if (storage) storage.remove(keys, renderHistory);
+  else renderHistory();
 });
 
 /* ── Init: query active tab ── */
@@ -177,9 +196,14 @@ async function init() {
       return;
     }
 
-    const record = await new Promise((r) =>
-      chrome.storage.local.get(["ytTracker_" + response.id], (d) => r(d["ytTracker_" + response.id] || null))
-    );
+    const storage = getStorageArea();
+    const record = await new Promise((r) => {
+      if (!storage) {
+        r(null);
+        return;
+      }
+      storage.get(["ytTracker_" + response.id], (d = {}) => r(d["ytTracker_" + response.id] || null));
+    });
 
     updateNowPlaying(response, record);
   });
@@ -188,9 +212,14 @@ async function init() {
 // Listen for live ticks from content script
 chrome.runtime.onMessage.addListener(async (msg) => {
   if (msg.type === "YT_TICK") {
-    const record = await new Promise((r) =>
-      chrome.storage.local.get(["ytTracker_" + msg.data.id], (d) => r(d["ytTracker_" + msg.data.id] || null))
-    );
+    const storage = getStorageArea();
+    const record = await new Promise((r) => {
+      if (!storage) {
+        r(null);
+        return;
+      }
+      storage.get(["ytTracker_" + msg.data.id], (d = {}) => r(d["ytTracker_" + msg.data.id] || null));
+    });
     updateNowPlaying({ ...msg.data, playing: true }, record);
   }
 });

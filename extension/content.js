@@ -27,40 +27,59 @@
   }
 
   function isPlaying() {
-    return video && !video.paused && !video.ended;
+    return video && !video.paused && !video.ended && video.readyState > 2;
   }
 
   /* ── storage helpers ── */
+  function getStorageArea() {
+    return globalThis.chrome?.storage?.local || globalThis.browser?.storage?.local || null;
+  }
+
   async function loadRecord(id) {
+    const storage = getStorageArea();
     return new Promise((res) => {
-      chrome.storage.local.get(["ytTracker_" + id], (r) => {
+      if (!storage) {
+        res(null);
+        return;
+      }
+      storage.get(["ytTracker_" + id], (r = {}) => {
         res(r["ytTracker_" + id] || null);
       });
     });
   }
 
   async function saveRecord(id, data) {
+    const storage = getStorageArea();
     return new Promise((res) => {
-      chrome.storage.local.set({ ["ytTracker_" + id]: data }, res);
+      if (!storage) {
+        res();
+        return;
+      }
+      storage.set({ ["ytTracker_" + id]: data }, res);
     });
   }
 
   async function loadHistory() {
+    const storage = getStorageArea();
     return new Promise((res) => {
-      chrome.storage.local.get(["ytTracker_history"], (r) => {
-        res(r["ytTracker_history"] || []);
+      if (!storage) {
+        res([]);
+        return;
+      }
+      storage.get(["ytTracker_history"], (r = {}) => {
+        res(r.ytTracker_history || []);
       });
     });
   }
 
   async function pushHistory(id) {
+    const storage = getStorageArea();
     const history = await loadHistory();
     if (!history.includes(id)) {
       history.unshift(id);
       if (history.length > 50) history.pop();
-      await new Promise((res) =>
-        chrome.storage.local.set({ ytTracker_history: history }, res)
-      );
+      if (!storage) return;
+      await new Promise((res) => storage.set({ ytTracker_history: history }, res));
     }
   }
 
