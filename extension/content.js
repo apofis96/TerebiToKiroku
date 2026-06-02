@@ -159,6 +159,72 @@
 
   findAndAttach();
 
+  /* ── overlay previews with a ■ symbol ── */
+  function createOverlayStyle() {
+    if (document.getElementById("tkrk-preview-overlay-style")) return;
+    const style = document.createElement("style");
+    style.id = "tkrk-preview-overlay-style";
+    style.textContent = `
+    .tkrk-preview-overlay { position: absolute; top: 6px; left: 6px; z-index: 9999; color: #fff; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 3px; font-weight: 700; font-size: 12px; line-height: 1; pointer-events: none; }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function getPreviewVideoId(el) {
+    debugger;
+    if (!el) return null;
+    const link = el.querySelector('a[href*="/watch?v="]') || el.querySelector('a[href*="watch?v="]');
+    if (!link) return null;
+    try {
+      const url = new URL(link.href, window.location.origin);
+      return url.searchParams.get('v');
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function addOverlayTo(el) {
+    if (!el || el.querySelector(".tkrk-preview-overlay")) return;
+    try {
+      const cs = window.getComputedStyle(el);
+      if (cs.position === "static") el.style.position = "relative";
+    } catch (e) {}
+    const badge = document.createElement("div");
+    badge.className = "tkrk-preview-overlay";
+    const previewId = getPreviewVideoId(el);
+    console.log("Adding preview badge for videoId1:", previewId);
+    badge.textContent = previewId ? `■ ${previewId}` : "■";
+    el.appendChild(badge);
+  }
+
+  function scanForPreviews() {
+    // Common YouTube preview containers
+    const selectors = [
+      'yt-thumbnail-view-model',
+      'yt-lockup-view-model',
+    ];
+    const nodes = document.querySelectorAll(selectors.join(','));
+    nodes.forEach((n) => addOverlayTo(n));
+  }
+
+  function startPreviewObserver() {
+    createOverlayStyle();
+    scanForPreviews();
+    const obs = new MutationObserver((mutations) => {
+      let added = false;
+      for (const m of mutations) {
+        if (m.addedNodes && m.addedNodes.length) {
+          added = true;
+          break;
+        }
+      }
+      if (added) scanForPreviews();
+    });
+    obs.observe(document.body, { childList: true, subtree: true });
+  }
+
+  startPreviewObserver();
+
   // Handle popup asking for current state
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     if (msg.type === "GET_CURRENT") {
