@@ -183,7 +183,7 @@
     }
   }
 
-  function addOverlayTo(el) {
+  async function addOverlayTo(el) {
     if (!el || el.querySelector(".tkrk-preview-overlay")) return;
     try {
       const cs = window.getComputedStyle(el);
@@ -193,7 +193,26 @@
     badge.className = "tkrk-preview-overlay";
     const previewId = getPreviewVideoId(el);
     console.log("Adding preview badge for videoId1:", previewId);
-    badge.textContent = previewId ? `■ ${previewId}` : "■";
+    
+    // Check if previewId is in history
+    let isInHistory = false;
+    if (previewId) {
+      const storage = getStorageArea();
+      const history = await new Promise((res) => {
+        if (!storage) {
+          res([]);
+          return;
+        }
+        storage.get(["ytTracker_history"], (r = {}) => {
+          res(r.ytTracker_history || []);
+        });
+      });
+      isInHistory = history.includes(previewId);
+    }
+    
+    // Show circle if in history, square if not
+    const marker = isInHistory ? "●" : "■";
+    badge.textContent = previewId ? `${marker} ${previewId}` : marker;
     el.appendChild(badge);
   }
 
