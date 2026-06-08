@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TerebiToKiroku.Application\TerebiToKiroku.Application.csproj" />
-    <ProjectReference Include="..\TerebiToKiroku.WebAPI\TerebiToKiroku.WebAPI.csproj" />
   </ItemGroup>
 
 </Project>

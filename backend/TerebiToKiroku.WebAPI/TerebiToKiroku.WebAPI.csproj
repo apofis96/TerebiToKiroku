@@ -14,6 +14,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TerebiToKiroku.Application\TerebiToKiroku.Application.csproj" />
+    <ProjectReference Include="..\TerebiToKiroku.Domain\TerebiToKiroku.Domain.csproj" />
+    <ProjectReference Include="..\TerebiToKiroku.Infrastructure\TerebiToKiroku.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
