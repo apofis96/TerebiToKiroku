@@ -1,3 +1,6 @@
 <Solution>
+  <Project Path="TerebiToKiroku.Application/TerebiToKiroku.Application.csproj" Id="d97dc52d-0fed-4d87-82d7-8bccf6c9239e" />
+  <Project Path="TerebiToKiroku.Domain/TerebiToKiroku.Domain.csproj" Id="ff629cde-bd99-49df-ba86-f21c5153ef8a" />
+  <Project Path="TerebiToKiroku.Infrastructure/TerebiToKiroku.Infrastructure.csproj" Id="566aa531-4b39-49ee-883c-0415d31826ba" />
   <Project Path="TerebiToKiroku.WebAPI/TerebiToKiroku.WebAPI.csproj" />
 </Solution>
