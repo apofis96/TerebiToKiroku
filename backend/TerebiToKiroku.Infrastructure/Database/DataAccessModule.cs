@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TerebiToKiroku.Application;
 using TerebiToKiroku.Application.Configuration.Data;
+using TerebiToKiroku.Domain.SeedWork;
 using TerebiToKiroku.Domain.Videos;
 using TerebiToKiroku.Infrastructure.Domain;
 using TerebiToKiroku.Infrastructure.Domain.Videos;
