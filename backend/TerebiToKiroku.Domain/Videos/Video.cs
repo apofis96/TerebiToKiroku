@@ -1,4 +1,5 @@
 ﻿using TerebiToKiroku.Domain.SeedWork;
+using TerebiToKiroku.Domain.Videos.WatchSessions;
 
 namespace TerebiToKiroku.Domain.Videos
 {
@@ -10,13 +11,20 @@ namespace TerebiToKiroku.Domain.Videos
 
         public string Key { get; private set; }
 
+        public int Duration { get; private set; }
+
+        public List<WatchSession> WatchSessions { get; private set; }
+
         private Video() {}
 
-        public Video(string key, string name)
+        public Video(string key, string name, int duration)
         {
             Id = new VideoId(Guid.NewGuid());
             Key = key;
             Name = name;
+            Duration = duration;
+            WatchSessions = new List<WatchSession>();
+            CreatedAt = DateTime.UtcNow;
         }
     }
 }

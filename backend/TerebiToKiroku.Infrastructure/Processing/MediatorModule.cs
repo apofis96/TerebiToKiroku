@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Autofac;
+﻿using Autofac;
 using Autofac.Core;
+using Autofac.Extensions.DependencyInjection;
 using Autofac.Features.Variance;
 using FluentValidation;
 using MediatR;
 using MediatR.Pipeline;
+using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using TerebiToKiroku.Application.Configuration.Validation;
-using TerebiToKiroku.Application.Orders.GetCustomerOrders;
 
 namespace TerebiToKiroku.Infrastructure.Processing
 {
@@ -44,11 +42,10 @@ namespace TerebiToKiroku.Infrastructure.Processing
             builder.RegisterGeneric(typeof(RequestPostProcessorBehavior<,>)).As(typeof(IPipelineBehavior<,>));
             builder.RegisterGeneric(typeof(RequestPreProcessorBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
-            builder.Register<ServiceFactory>(ctx =>
-            {
-                var c = ctx.Resolve<IComponentContext>();
-                return t => c.Resolve(t);
-            });
+
+            var services = new ServiceCollection();
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(MediatorModule).Assembly));
+            builder.Populate(services);
 
             builder.RegisterGeneric(typeof(CommandValidationBehavior<,>)).As(typeof(IPipelineBehavior<,>));
         }
@@ -67,9 +64,7 @@ namespace TerebiToKiroku.Infrastructure.Processing
                 _types.AddRange(types);
             }
 
-            public IEnumerable<IComponentRegistration> RegistrationsFor(
-                Service service,
-                Func<Service, IEnumerable<IComponentRegistration>> registrationAccessor)
+            public IEnumerable<IComponentRegistration> RegistrationsFor(Service service, Func<Service, IEnumerable<ServiceRegistration>> registrationAccessor)
             {
                 var components = _source.RegistrationsFor(service, registrationAccessor);
                 foreach (var c in components)

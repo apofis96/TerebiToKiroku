@@ -15,18 +15,29 @@ namespace TerebiToKiroku.Infrastructure.Domain.Videos
             this._context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        /*public async Task AddAsync(Customer customer)
+        public Task<List<Video>> GetAll()
         {
-            await this._context.Customers.AddAsync(customer);
+            throw new NotImplementedException();
         }
 
-        public async Task<Customer> GetByIdAsync(CustomerId id)
+        public Task<Video> GetById(VideoId id)
         {
-            return await this._context.Customers
-                .IncludePaths(
-                    CustomerEntityTypeConfiguration.OrdersList,
-                    CustomerEntityTypeConfiguration.OrderProducts)
-                .SingleAsync(x => x.Id == id);
-        }*/
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Video>> GetByIds(List<VideoId> ids)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Video> GetByKey(string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Video>> GetByKeys(List<string> keys)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

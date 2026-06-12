@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace TerebiToKiroku.Domain.Products
+﻿namespace TerebiToKiroku.Domain.Videos
 {
-    public interface IProductRepository
+    public interface IVideoRepository
     {
-        Task<List<Product>> GetByIdsAsync(List<ProductId> ids);
+        Task<Video> GetById(VideoId id);
+        Task<Video> GetByKey(string key);
+        Task<List<Video>> GetByIds(List<VideoId> ids);
+        Task<List<Video>> GetByKeys(List<string> keys);
 
-        Task<List<Product>> GetAllAsync();
+        Task<List<Video>> GetAll();
     }
 }

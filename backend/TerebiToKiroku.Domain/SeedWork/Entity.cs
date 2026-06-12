@@ -7,6 +7,8 @@ namespace TerebiToKiroku.Domain.SeedWork
     /// </summary>
     public abstract class Entity
     {
+        public DateTime CreatedAt { get; protected set; }
+
         private List<IDomainEvent> _domainEvents;
 
         /// <summary>

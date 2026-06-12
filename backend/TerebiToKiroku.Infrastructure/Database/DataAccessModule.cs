@@ -1,7 +1,5 @@
 ﻿using Autofac;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TerebiToKiroku.Application;
 using TerebiToKiroku.Application.Configuration.Data;
 using TerebiToKiroku.Domain.SeedWork;
 using TerebiToKiroku.Domain.Videos;
@@ -30,32 +28,18 @@ namespace TerebiToKiroku.Infrastructure.Database
                 .As<IUnitOfWork>()
                 .InstancePerLifetimeScope();
 
-
-            builder.RegisterType<CustomerRepository>()
-                .As<ICustomerRepository>()
+            builder.RegisterType<VideoRepository>()
+                .As<IVideoRepository>()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterType<ProductRepository>()
-                .As<IProductRepository>()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<PaymentRepository>()
-                .As<IPaymentRepository>()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<StronglyTypedIdValueConverterSelector>()
-                .As<IValueConverterSelector>()
-                .SingleInstance();
 
             builder
                 .Register(c =>
                 {
-                    var dbContextOptionsBuilder = new DbContextOptionsBuilder<OrdersContext>();
-                    dbContextOptionsBuilder.UseSqlServer(_databaseConnectionString);
-                    dbContextOptionsBuilder
-                        .ReplaceService<IValueConverterSelector, StronglyTypedIdValueConverterSelector>();
+                    var dbContextOptionsBuilder = new DbContextOptionsBuilder<VideosContext>();
+                    dbContextOptionsBuilder.UseNpgsql(_databaseConnectionString);
 
-                    return new OrdersContext(dbContextOptionsBuilder.Options);
+                    return new VideosContext(dbContextOptionsBuilder.Options);
                 })
                 .AsSelf()
                 .As<DbContext>()

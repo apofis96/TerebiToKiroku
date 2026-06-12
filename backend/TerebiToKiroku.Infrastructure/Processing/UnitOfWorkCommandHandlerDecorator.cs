@@ -16,16 +16,16 @@ namespace TerebiToKiroku.Infrastructure.Processing
 
         private readonly IUnitOfWork _unitOfWork;
 
-        private readonly OrdersContext _ordersContext;
+        private readonly VideosContext _videosContext;
 
         public UnitOfWorkCommandHandlerDecorator(
             ICommandHandler<T> decorated, 
             IUnitOfWork unitOfWork, 
-            OrdersContext ordersContext)
+            VideosContext videosContext)
         {
             _decorated = decorated;
             _unitOfWork = unitOfWork;
-            _ordersContext = ordersContext;
+            _videosContext = videosContext;
         }
 
         public async Task<Unit> Handle(T command, CancellationToken cancellationToken)
@@ -35,7 +35,7 @@ namespace TerebiToKiroku.Infrastructure.Processing
             if (command is InternalCommandBase)
             {
                 var internalCommand =
-                    await _ordersContext.InternalCommands.FirstOrDefaultAsync(x => x.Id == command.Id,
+                    await _videosContext.InternalCommands.FirstOrDefaultAsync(x => x.Id == command.Id,
                         cancellationToken: cancellationToken);
 
                 if (internalCommand != null)

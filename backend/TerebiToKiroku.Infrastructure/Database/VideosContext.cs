@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TerebiToKiroku.Domain.Customers;
-using TerebiToKiroku.Domain.Payments;
-using TerebiToKiroku.Domain.Products;
+using TerebiToKiroku.Domain.Videos;
 using TerebiToKiroku.Infrastructure.Processing.InternalCommands;
 
 namespace TerebiToKiroku.Infrastructure.Database

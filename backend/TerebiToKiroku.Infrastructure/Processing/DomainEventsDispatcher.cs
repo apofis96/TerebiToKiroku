@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Autofac;
+﻿using Autofac;
 using Autofac.Core;
 using MediatR;
-using Newtonsoft.Json;
 using TerebiToKiroku.Application.Configuration.DomainEvents;
 using TerebiToKiroku.Domain.SeedWork;
 using TerebiToKiroku.Infrastructure.Database;
-using TerebiToKiroku.Infrastructure.Processing.Outbox;
 
 namespace TerebiToKiroku.Infrastructure.Processing
 {
@@ -17,18 +11,18 @@ namespace TerebiToKiroku.Infrastructure.Processing
     {
         private readonly IMediator _mediator;
         private readonly ILifetimeScope _scope;
-        private readonly OrdersContext _ordersContext;
+        private readonly VideosContext _videosContext;
 
-        public DomainEventsDispatcher(IMediator mediator, ILifetimeScope scope, OrdersContext ordersContext)
+        public DomainEventsDispatcher(IMediator mediator, ILifetimeScope scope, VideosContext videosContext)
         {
             this._mediator = mediator;
             this._scope = scope;
-            this._ordersContext = ordersContext;
+            this._videosContext = videosContext;
         }
 
         public async Task DispatchEventsAsync()
         {
-            var domainEntities = this._ordersContext.ChangeTracker
+            var domainEntities = this._videosContext.ChangeTracker
                 .Entries<Entity>()
                 .Where(x => x.Entity.DomainEvents != null && x.Entity.DomainEvents.Any()).ToList();
 
@@ -62,17 +56,6 @@ namespace TerebiToKiroku.Infrastructure.Processing
                 });
 
             await Task.WhenAll(tasks);
-
-            foreach (var domainEventNotification in domainEventNotifications)
-            {
-                string type = domainEventNotification.GetType().FullName;
-                var data = JsonConvert.SerializeObject(domainEventNotification);
-                OutboxMessage outboxMessage = new OutboxMessage(
-                    domainEventNotification.DomainEvent.OccurredOn,
-                    type,
-                    data);
-                this._ordersContext.OutboxMessages.Add(outboxMessage);
-            }
         }
     }
 }

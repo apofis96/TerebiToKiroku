@@ -1,7 +1,5 @@
-﻿using System;
+﻿using Npgsql;
 using System.Data;
-using System.Data.SqlClient;
-using TerebiToKiroku.Application;
 using TerebiToKiroku.Application.Configuration.Data;
 
 namespace TerebiToKiroku.Infrastructure.Database
@@ -20,7 +18,7 @@ namespace TerebiToKiroku.Infrastructure.Database
         {
             if (this._connection == null || this._connection.State != ConnectionState.Open)
             {
-                this._connection = new SqlConnection(_connectionString);
+                this._connection = new NpgsqlConnection(_connectionString);
                 this._connection.Open();
             }
 

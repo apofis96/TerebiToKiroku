@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Dapper;
 using MediatR;
-using Newtonsoft.Json;
 using TerebiToKiroku.Application;
 using TerebiToKiroku.Application.Configuration.Commands;
 using TerebiToKiroku.Application.Configuration.Data;
@@ -31,7 +31,7 @@ namespace TerebiToKiroku.Infrastructure.Processing
                 command.Id,
                 EnqueueDate = DateTime.UtcNow,
                 Type = command.GetType().FullName,
-                Data = JsonConvert.SerializeObject(command)
+                Data = JsonSerializer.Serialize(command)
             });
         }
     }

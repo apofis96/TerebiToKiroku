@@ -1,16 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TerebiToKiroku.Domain.Customers;
-using TerebiToKiroku.Domain.Customers.Orders;
-using TerebiToKiroku.Domain.Products;
-using TerebiToKiroku.Domain.SharedKernel;
 using TerebiToKiroku.Infrastructure.Database;
 using System;
 
 namespace TerebiToKiroku.Infrastructure.Domain.Videos
 {
-    internal sealed class CustomerEntityTypeConfiguration : IEntityTypeConfiguration<Video>
+    internal sealed class VideoEntityTypeConfiguration : IEntityTypeConfiguration<Video>
     {
         /*internal const string OrdersList = "_orders";
         internal const string OrderProducts = "_orderProducts";

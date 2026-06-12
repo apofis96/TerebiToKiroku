@@ -1,12 +1,7 @@
-﻿using System.Reflection;
-using Autofac;
+﻿using Autofac;
 using MediatR;
-using TerebiToKiroku.Application;
 using TerebiToKiroku.Application.Configuration.Commands;
-using TerebiToKiroku.Application.Configuration.DomainEvents;
 using TerebiToKiroku.Application.Configuration.Processing;
-using TerebiToKiroku.Application.Payments;
-using TerebiToKiroku.Infrastructure.Logging;
 using TerebiToKiroku.Infrastructure.Processing.InternalCommands;
 
 namespace TerebiToKiroku.Infrastructure.Processing
@@ -18,9 +13,6 @@ namespace TerebiToKiroku.Infrastructure.Processing
             builder.RegisterType<DomainEventsDispatcher>()
                 .As<IDomainEventsDispatcher>()
                 .InstancePerLifetimeScope();
-
-            builder.RegisterAssemblyTypes(typeof(PaymentCreatedNotification).GetTypeInfo().Assembly)
-                .AsClosedTypesOf(typeof(IDomainEventNotification<>)).InstancePerDependency();
 
             builder.RegisterGenericDecorator(
                 typeof(DomainEventsDispatcherNotificationHandlerDecorator<>), 
@@ -41,14 +33,6 @@ namespace TerebiToKiroku.Infrastructure.Processing
             builder.RegisterType<CommandsScheduler>()
                 .As<ICommandsScheduler>()
                 .InstancePerLifetimeScope();
-
-            builder.RegisterGenericDecorator(
-                typeof(LoggingCommandHandlerDecorator<>),
-                typeof(ICommandHandler<>));
-
-            builder.RegisterGenericDecorator(
-                typeof(LoggingCommandHandlerWithResultDecorator<,>),
-                typeof(ICommandHandler<,>));
         }
     }
 }
