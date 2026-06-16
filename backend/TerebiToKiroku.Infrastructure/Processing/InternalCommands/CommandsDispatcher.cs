@@ -1,12 +1,8 @@
-﻿using System;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using TerebiToKiroku.Application.Configuration.Processing;
-using TerebiToKiroku.Application.Videos;
+using TerebiToKiroku.Application.Videos.StartWatchVideo;
 using TerebiToKiroku.Infrastructure.Database;
 
 namespace TerebiToKiroku.Infrastructure.Processing.InternalCommands
@@ -28,7 +24,7 @@ namespace TerebiToKiroku.Infrastructure.Processing.InternalCommands
         {
             var internalCommand = await this._videosContext.InternalCommands.SingleOrDefaultAsync(x => x.Id == id);
 
-            Type type = Assembly.GetAssembly(typeof(MarkCustomerAsWelcomedCommand)).GetType(internalCommand.Type);
+            Type type = Assembly.GetAssembly(typeof(StartWatchVideoCommand)).GetType(internalCommand.Type);
             dynamic command = JsonSerializer.Deserialize(internalCommand.Data, type);
 
             internalCommand.ProcessedDate = DateTime.UtcNow;

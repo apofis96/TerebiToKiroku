@@ -2,6 +2,8 @@
 {
     public interface IVideoRepository
     {
+        Task Add(Video video);
+
         Task<Video> GetById(VideoId id);
         Task<Video> GetByKey(string key);
         Task<List<Video>> GetByIds(List<VideoId> ids);

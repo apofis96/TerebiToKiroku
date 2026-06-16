@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using TerebiToKiroku.Domain.SeedWork;
 using TerebiToKiroku.Infrastructure.Database;
 using TerebiToKiroku.Infrastructure.Processing;
 

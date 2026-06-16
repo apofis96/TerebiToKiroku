@@ -1,9 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using TerebiToKiroku.Application;
+﻿using Microsoft.EntityFrameworkCore;
 using TerebiToKiroku.Application.Configuration.Commands;
 using TerebiToKiroku.Domain.SeedWork;
 using TerebiToKiroku.Infrastructure.Database;
@@ -28,7 +23,7 @@ namespace TerebiToKiroku.Infrastructure.Processing
             _videosContext = videosContext;
         }
 
-        public async Task<Unit> Handle(T command, CancellationToken cancellationToken)
+        public async Task Handle(T command, CancellationToken cancellationToken)
         {
             await this._decorated.Handle(command, cancellationToken);
 
@@ -45,8 +40,6 @@ namespace TerebiToKiroku.Infrastructure.Processing
             }
 
             await this._unitOfWork.CommitAsync(cancellationToken);
-
-            return Unit.Value;
         }
     }
 }
