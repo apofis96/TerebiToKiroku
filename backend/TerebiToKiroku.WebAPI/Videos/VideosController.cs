@@ -1,5 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using TerebiToKiroku.Application.Videos;
+using TerebiToKiroku.Application.Videos.StartWatchVideo;
 
 namespace TerebiToKiroku.WebAPI.Videos
 {
@@ -14,26 +17,14 @@ namespace TerebiToKiroku.WebAPI.Videos
             this._mediator = mediator;
         }
 
-        /*[Route("{customerId}/orders")]
-        [HttpGet]
-        [ProducesResponseType(typeof(List<OrderDto>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetCustomerOrders(Guid customerId)
-        {
-            var orders = await _mediator.Send(new GetCustomerOrdersQuery(customerId));
-
-            return Ok(orders);
-        }
-
-        [Route("{customerId}/orders")]
+        [Route("")]
         [HttpPost]
-        [ProducesResponseType((int)HttpStatusCode.Created)]
-        public async Task<IActionResult> AddCustomerOrder(
-            [FromRoute] Guid customerId,
-            [FromBody] CustomerOrderRequest request)
+        [ProducesResponseType(typeof(VideoDto), (int)HttpStatusCode.Created)]
+        public async Task<IActionResult> RegisterCustomer([FromBody] StartWatchVideoRequest request)
         {
-            await _mediator.Send(new PlaceCustomerOrderCommand(customerId, request.Products, request.Currency));
+            var video = await _mediator.Send(new StartWatchVideoCommand(request.Name, request.Key, request.Duration));
 
-            return Created(string.Empty, null);
-        }*/
+            return Created(string.Empty, video);
+        }
     }
 }
