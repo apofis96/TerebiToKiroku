@@ -7,6 +7,7 @@
   let tickInterval = null;
   let video = null;
   let videoId = null;
+  let lastReportedProgressMilestone = 0;
 
   /* ── helpers ── */
   function getVideoId() {
@@ -81,13 +82,29 @@
       if (!storage) return;
       await new Promise((res) => storage.set({ ytTracker_history: history }, res));
 
-      try {
-        await fetch("https://example.com/", {
-          method: "GET",
-          mode: "no-cors",
-          cache: "no-store",
-        });
-      } catch (e) {}
+    }
+  }
+
+  function sendProgressPing() {
+    try {
+      fetch("https://example.com/", {
+        method: "GET",
+        mode: "no-cors",
+        cache: "no-store",
+      });
+    } catch (e) {}
+  }
+
+  function maybeSendProgressMilestones(currentTime) {
+    const duration = getDuration();
+    if (!duration) return;
+
+    const progressPercent = Math.floor((currentTime / duration) * 100);
+    const nextMilestone = Math.floor(progressPercent / 10) * 10;
+
+    while (lastReportedProgressMilestone < nextMilestone) {
+      lastReportedProgressMilestone += 10;
+      sendProgressPing();
     }
   }
 
@@ -102,6 +119,7 @@
       sessionWatchedSeconds += ct - lastCurrentTime;
     }
     lastCurrentTime = ct;
+    maybeSendProgressMilestones(ct);
 
     const record = (await loadRecord(videoId)) || {
       id: videoId,
@@ -144,6 +162,7 @@
     sessionStart = Date.now();
     sessionWatchedSeconds = 0;
     lastCurrentTime = null;
+    lastReportedProgressMilestone = 0;
 
     if (tickInterval) clearInterval(tickInterval);
     tickInterval = setInterval(tick, 1000);
