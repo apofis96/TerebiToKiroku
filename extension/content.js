@@ -73,6 +73,31 @@
     });
   }
 
+  async function loadProgressMilestone(id) {
+    const storage = getStorageArea();
+    return new Promise((res) => {
+      if (!storage) {
+        res(0);
+        return;
+      }
+      storage.get(["ytTracker_progress_" + id], (r = {}) => {
+        const value = r["ytTracker_progress_" + id];
+        res(typeof value === "number" ? value : 0);
+      });
+    });
+  }
+
+  async function saveProgressMilestone(id, milestone) {
+    const storage = getStorageArea();
+    return new Promise((res) => {
+      if (!storage) {
+        res();
+        return;
+      }
+      storage.set({ ["ytTracker_progress_" + id]: milestone }, res);
+    });
+  }
+
   async function pushHistory(id) {
     const storage = getStorageArea();
     const history = await loadHistory();
@@ -104,6 +129,9 @@
 
     while (lastReportedProgressMilestone < nextMilestone) {
       lastReportedProgressMilestone += 10;
+      if (videoId) {
+        saveProgressMilestone(videoId, lastReportedProgressMilestone).catch(() => {});
+      }
       sendProgressPing();
     }
   }
@@ -156,7 +184,7 @@
   }
 
   /* ── init ── */
-  function attachVideo(v) {
+  async function attachVideo(v) {
     video = v;
     videoId = getVideoId();
     sessionStart = Date.now();
@@ -165,6 +193,11 @@
     lastReportedProgressMilestone = 0;
 
     if (tickInterval) clearInterval(tickInterval);
+
+    if (videoId) {
+      lastReportedProgressMilestone = await loadProgressMilestone(videoId);
+    }
+
     tickInterval = setInterval(tick, 1000);
   }
 
@@ -198,7 +231,6 @@
   }
 
   function getPreviewVideoId(el) {
-    debugger;
     if (!el) return null;
     const link = el.querySelector('a[href*="/watch?v="]') || el.querySelector('a[href*="watch?v="]');
     if (!link) return null;
