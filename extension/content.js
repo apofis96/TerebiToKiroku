@@ -252,25 +252,39 @@
     badge.className = "tkrk-preview-overlay";
     const previewId = getPreviewVideoId(el);
     console.log("Adding preview badge for videoId1:", previewId);
-    
-    // Check if previewId is in history
-    let isInHistory = false;
+
+    let marker = "■";
     if (previewId) {
       const storage = getStorageArea();
-      const history = await new Promise((res) => {
-        if (!storage) {
-          res([]);
-          return;
-        }
-        storage.get(["ytTracker_history"], (r = {}) => {
-          res(r.ytTracker_history || []);
-        });
-      });
-      isInHistory = history.includes(previewId);
+      const [history, record] = await Promise.all([
+        new Promise((res) => {
+          if (!storage) {
+            res([]);
+            return;
+          }
+          storage.get(["ytTracker_history"], (r = {}) => {
+            res(r.ytTracker_history || []);
+          });
+        }),
+        new Promise((res) => {
+          if (!storage) {
+            res(null);
+            return;
+          }
+          storage.get(["ytTracker_" + previewId], (r = {}) => {
+            res(r["ytTracker_" + previewId] || null);
+          });
+        }),
+      ]);
+
+      const duration = Number(record?.duration || 0);
+      const watchedSeconds = Number(record?.watchedSeconds || 0);
+      const isFullyWatched = Boolean(record && duration > 0 && watchedSeconds >= duration);
+      const isInHistory = history.includes(previewId);
+
+      marker = isFullyWatched ? "▲" : isInHistory ? "●" : "■";
     }
-    
-    // Show circle if in history, square if not
-    const marker = isInHistory ? "●" : "■";
+
     badge.textContent = previewId ? `${marker} ${previewId}` : marker;
     el.appendChild(badge);
   }
