@@ -8,6 +8,7 @@
   let video = null;
   let videoId = null;
   let lastReportedProgressMilestone = 0;
+  let lastTitleMarker = null;
 
   /* ── helpers ── */
   function getVideoId() {
@@ -85,6 +86,16 @@
         res(typeof value === "number" ? value : 0);
       });
     });
+  }
+
+  async function getMarkerForId(id) {
+    const history = await loadHistory();
+    const record = await loadRecord(id);
+    const duration = Number(record?.duration || 0);
+    const watchedSeconds = Number(record?.watchedSeconds || 0);
+    const isFullyWatched = Boolean(record && duration > 0 && watchedSeconds >= duration);
+    const isInHistory = history.includes(id);
+    return isFullyWatched ? '▲' : isInHistory ? '●' : '■';
   }
 
   async function saveProgressMilestone(id, milestone) {
@@ -167,6 +178,7 @@
 
     await saveRecord(videoId, record);
     await pushHistory(videoId);
+    await updateWatchTitleMarker().catch(() => {});
 
     // Broadcast to popup if open
     chrome.runtime.sendMessage({
@@ -191,6 +203,7 @@
     sessionWatchedSeconds = 0;
     lastCurrentTime = null;
     lastReportedProgressMilestone = 0;
+    lastTitleMarker = null;
 
     if (tickInterval) clearInterval(tickInterval);
 
@@ -199,6 +212,7 @@
     }
 
     tickInterval = setInterval(tick, 1000);
+    await updateWatchTitleMarker().catch(() => {});
   }
 
   function findAndAttach() {
@@ -255,38 +269,39 @@
 
     let marker = "■";
     if (previewId) {
-      const storage = getStorageArea();
-      const [history, record] = await Promise.all([
-        new Promise((res) => {
-          if (!storage) {
-            res([]);
-            return;
-          }
-          storage.get(["ytTracker_history"], (r = {}) => {
-            res(r.ytTracker_history || []);
-          });
-        }),
-        new Promise((res) => {
-          if (!storage) {
-            res(null);
-            return;
-          }
-          storage.get(["ytTracker_" + previewId], (r = {}) => {
-            res(r["ytTracker_" + previewId] || null);
-          });
-        }),
-      ]);
-
-      const duration = Number(record?.duration || 0);
-      const watchedSeconds = Number(record?.watchedSeconds || 0);
-      const isFullyWatched = Boolean(record && duration > 0 && watchedSeconds >= duration);
-      const isInHistory = history.includes(previewId);
-
-      marker = isFullyWatched ? "▲" : isInHistory ? "●" : "■";
+      marker = await getMarkerForId(previewId);
     }
 
     badge.textContent = previewId ? `${marker} ${previewId}` : marker;
     el.appendChild(badge);
+  }
+
+  function getWatchTitleElement() {
+    return document.querySelector(
+      'ytd-video-primary-info-renderer h1.title, ytd-video-primary-info-renderer h1, #meta-contents h1, #container h1'
+    );
+  }
+
+  async function updateWatchTitleMarker() {
+    if (!videoId) return;
+    const titleEl = getWatchTitleElement();
+    if (!titleEl) return;
+
+    const marker = await getMarkerForId(videoId);
+
+    if (marker === lastTitleMarker) return;
+    lastTitleMarker = marker;
+
+    let markerEl = titleEl.querySelector('.tkrk-title-marker');
+    if (!markerEl) {
+      markerEl = document.createElement('span');
+      markerEl.className = 'tkrk-title-marker';
+      markerEl.style.marginRight = '0.5rem';
+      markerEl.style.fontWeight = '700';
+      markerEl.style.display = 'inline-block';
+      titleEl.prepend(markerEl);
+    }
+    markerEl.textContent = marker;
   }
 
   function scanForPreviews() {
