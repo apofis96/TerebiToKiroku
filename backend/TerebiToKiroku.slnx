@@ -1,3 +1,7 @@
 <Solution>
+  <Project Path="TerebiToKiroku.Application/TerebiToKiroku.Application.csproj" Id="a72e8ec3-ec87-4c1b-b1f9-45d697497554" />
+  <Project Path="TerebiToKiroku.Domain/TerebiToKiroku.Domain.csproj" Id="016eefa1-c360-405b-ad34-5fd2f1697bf8" />
+  <Project Path="TerebiToKiroku.Infrastructure/TerebiToKiroku.Infrastructure.csproj" Id="c0af5be9-5b22-4142-8cdc-2a75a48a0cbf" />
+  <Project Path="TerebiToKiroku.Migrations/TerebiToKiroku.Migrations.csproj" Id="cf1f8a7d-2ffe-4eb3-8f7a-92d0e5dab7c8" />
   <Project Path="TerebiToKiroku.WebAPI/TerebiToKiroku.WebAPI.csproj" />
 </Solution>
