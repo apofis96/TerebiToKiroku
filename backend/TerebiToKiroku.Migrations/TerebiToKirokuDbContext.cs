@@ -6,16 +6,9 @@ namespace TerebiToKiroku.Migrations
     public class TerebiToKirokuDbContext(DbContextOptions<TerebiToKirokuDbContext> options) : DbContext(options)
     {
         public DbSet<Video> Videos => Set<Video>();
+        public DbSet<WatchSession> WatchSessions => Set<WatchSession>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Video>(e =>
-            {
-                e.ToTable("videos");
-                e.HasKey(x => x.Id);
-                e.Property(x => x.Id).HasColumnName("id");
-                e.Property(x => x.CreatedAt).HasColumnName("created_at");
-            });
-        }
+        { }
     }
 }
