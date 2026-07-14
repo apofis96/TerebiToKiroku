@@ -18,7 +18,7 @@
             Key = key;
             Name = name;
             Duration = duration;
-            WatchSessions = new List<WatchSession>();
+            WatchSessions = [];
             CreatedAt = DateTime.UtcNow;
         }
 

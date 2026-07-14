@@ -5,7 +5,7 @@ namespace TerebiToKiroku.Migrations
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true)
