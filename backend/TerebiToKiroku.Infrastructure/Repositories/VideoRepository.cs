@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using System.Data;
 using TerebiToKiroku.Domain.Entities;
 using TerebiToKiroku.Domain.Interfaces;
 using TerebiToKiroku.Infrastructure.Data;
@@ -20,29 +19,65 @@ namespace TerebiToKiroku.Infrastructure.Repositories
             await connection.ExecuteAsync(query, new { video.Id, video.Name, video.Key, video.Duration });
         }
 
-        public Task<List<Video>> GetAll()
+        public async Task<List<Video>> GetAll()
         {
-            throw new NotImplementedException();
+            const string query = "SELECT Id, Name, Key, Duration, CreatedAt FROM Videos";
+
+            using var connection = _factory.CreateConnection();
+
+            var result = await connection.QueryAsync<Video>(query);
+
+            return [.. result];
         }
 
-        public Task<Video> GetById(Guid id)
+        public async Task<Video> GetById(Guid id)
         {
-            throw new NotImplementedException();
+            const string query = "SELECT Id, Name, Key, Duration, CreatedAt FROM Videos WHERE Id = @Id";
+
+            using var connection = _factory.CreateConnection();
+
+            var video = await connection.QuerySingleOrDefaultAsync<Video>(query, new { Id = id });
+
+            return video ?? throw new InvalidOperationException("Video not found");
         }
 
-        public Task<List<Video>> GetByIds(List<Guid> ids)
+        public async Task<List<Video>> GetByIds(List<Guid> ids)
         {
-            throw new NotImplementedException();
+            if (ids == null || ids.Count == 0)
+                return [];
+
+            const string query = "SELECT Id, Name, Key, Duration, CreatedAt FROM Videos WHERE Id = ANY(@Ids)";
+
+            using var connection = _factory.CreateConnection();
+
+            var result = await connection.QueryAsync<Video>(query, new { Ids = ids.ToArray() });
+
+            return [.. result];
         }
 
-        public Task<Video> GetByKey(string key)
+        public async Task<Video> GetByKey(string key)
         {
-            throw new NotImplementedException();
+            const string query = "SELECT Id, Name, Key, Duration, CreatedAt FROM Videos WHERE Key = @Key";
+
+            using var connection = _factory.CreateConnection();
+
+            var video = await connection.QuerySingleOrDefaultAsync<Video>(query, new { Key = key });
+
+            return video ?? throw new InvalidOperationException("Video not found");
         }
 
-        public Task<List<Video>> GetByKeys(List<string> keys)
+        public async Task<List<Video>> GetByKeys(List<string> keys)
         {
-            throw new NotImplementedException();
+            if (keys == null || keys.Count == 0)
+                return [];
+
+            const string query = "SELECT Id, Name, Key, Duration, CreatedAt FROM Videos WHERE Key = ANY(@Keys)";
+
+            using var connection = _factory.CreateConnection();
+
+            var result = await connection.QueryAsync<Video>(query, new { Keys = keys.ToArray() });
+
+            return [.. result];
         }
     }
 }

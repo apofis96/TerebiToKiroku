@@ -2,15 +2,15 @@
 {
     public class Video : Entity
     {
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
-        public string Key { get; private set; }
+        public string Key { get; set; }
 
-        public int Duration { get; private set; }
+        public int Duration { get; set; }
 
-        public List<WatchSession> WatchSessions { get; private set; }
+        public List<WatchSession> WatchSessions { get; set; }
 
-        private Video() { }
+        public Video() { }
 
         private Video(string key, string name, int duration)
         {
@@ -18,7 +18,7 @@
             Key = key;
             Name = name;
             Duration = duration;
-            WatchSessions = [];
+            WatchSessions = new List<WatchSession>();
             CreatedAt = DateTime.UtcNow;
         }
 
