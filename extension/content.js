@@ -8,7 +8,6 @@
   let video = null;
   let videoId = null;
   let lastReportedProgressMilestone = 0;
-  let lastTitleMarker = null;
 
   /* ── helpers ── */
   function getVideoId() {
@@ -178,7 +177,7 @@
 
     await saveRecord(videoId, record);
     await pushHistory(videoId);
-    await updateWatchTitleMarker().catch(() => {});
+    await updateWatchMarker().catch(() => {});
 
     // Broadcast to popup if open
     chrome.runtime.sendMessage({
@@ -203,7 +202,6 @@
     sessionWatchedSeconds = 0;
     lastCurrentTime = null;
     lastReportedProgressMilestone = 0;
-    lastTitleMarker = null;
 
     if (tickInterval) clearInterval(tickInterval);
 
@@ -212,7 +210,7 @@
     }
 
     tickInterval = setInterval(tick, 1000);
-    await updateWatchTitleMarker().catch(() => {});
+    await updateWatchMarker().catch(() => {});
   }
 
   function findAndAttach() {
@@ -222,12 +220,43 @@
     }
   }
 
+  function getWatchLikeButton() {
+    return document.querySelector(
+      'ytd-video-primary-info-renderer #like-button, ytd-video-primary-info-renderer ytd-toggle-button-renderer#like-button, ytd-video-primary-info-renderer ytd-toggle-button-renderer[aria-label*="like"], ytd-video-primary-info-renderer ytd-toggle-button-renderer[aria-label*="Like"]'
+    );
+  }
+
+  async function updateWatchMarker() {
+    if (!videoId) return;
+    const likeButton = getWatchLikeButton();
+    if (!likeButton) return;
+
+    const marker = await getMarkerForId(videoId);
+    const parent = likeButton.parentElement;
+    if (!parent) return;
+
+    let markerEl = parent.querySelector('.tkrk-watch-marker');
+    if (!markerEl) {
+      markerEl = document.createElement('span');
+      markerEl.className = 'tkrk-watch-marker';
+      markerEl.style.marginRight = '0.5rem';
+      markerEl.style.fontWeight = '700';
+      markerEl.style.display = 'inline-flex';
+      markerEl.style.alignItems = 'center';
+      markerEl.style.verticalAlign = 'middle';
+      parent.insertBefore(markerEl, likeButton);
+    }
+
+    markerEl.textContent = marker;
+  }
+
   // YouTube is a SPA — watch for navigation
   const observer = new MutationObserver(() => {
     const newId = getVideoId();
     if (newId && newId !== videoId) {
       findAndAttach();
     }
+    updateWatchMarker().catch(() => {});
   });
   observer.observe(document.body, { childList: true, subtree: true });
 
@@ -274,34 +303,6 @@
 
     badge.textContent = previewId ? `${marker} ${previewId}` : marker;
     el.appendChild(badge);
-  }
-
-  function getWatchTitleElement() {
-    return document.querySelector(
-      'ytd-video-primary-info-renderer h1.title, ytd-video-primary-info-renderer h1, #meta-contents h1, #container h1'
-    );
-  }
-
-  async function updateWatchTitleMarker() {
-    if (!videoId) return;
-    const titleEl = getWatchTitleElement();
-    if (!titleEl) return;
-
-    const marker = await getMarkerForId(videoId);
-
-    if (marker === lastTitleMarker) return;
-    lastTitleMarker = marker;
-
-    let markerEl = titleEl.querySelector('.tkrk-title-marker');
-    if (!markerEl) {
-      markerEl = document.createElement('span');
-      markerEl.className = 'tkrk-title-marker';
-      markerEl.style.marginRight = '0.5rem';
-      markerEl.style.fontWeight = '700';
-      markerEl.style.display = 'inline-block';
-      titleEl.prepend(markerEl);
-    }
-    markerEl.textContent = marker;
   }
 
   function scanForPreviews() {
