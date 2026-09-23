@@ -244,6 +244,10 @@
       markerEl.style.display = 'inline-flex';
       markerEl.style.alignItems = 'center';
       markerEl.style.verticalAlign = 'middle';
+      markerEl.style.whiteSpace = 'nowrap';
+      markerEl.style.color = '#f1f1f1';
+      markerEl.style.fontSize = '1.1rem';
+      markerEl.style.lineHeight = '1';
       parent.insertBefore(markerEl, likeButton);
     }
 
@@ -268,7 +272,7 @@
     const style = document.createElement("style");
     style.id = "tkrk-preview-overlay-style";
     style.textContent = `
-    .tkrk-preview-overlay { position: absolute; top: 6px; left: 6px; z-index: 9999; color: #fff; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 3px; font-weight: 700; font-size: 12px; line-height: 1; pointer-events: none; }
+    .tkrk-preview-overlay { position: absolute; left: 6px; bottom: 6px; top: auto; right: auto; z-index: 9999; color: #fff; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 3px; font-weight: 700; font-size: 12px; line-height: 1; pointer-events: none; }
     `;
     document.head.appendChild(style);
   }
