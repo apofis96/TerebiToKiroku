@@ -1,6 +1,8 @@
-﻿namespace TerebiToKiroku.Application.Videos.StartWatchVideo
+﻿using Mediator;
+
+namespace TerebiToKiroku.Application.Videos.StartWatchVideo
 {
-    public sealed record StartWatchVideoCommand
+    public sealed record StartWatchVideoCommand : ICommand
     {
     }
 }
