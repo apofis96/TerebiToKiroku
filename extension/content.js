@@ -279,11 +279,20 @@
 
   function getPreviewVideoId(el) {
     if (!el) return null;
-    const link = el.querySelector('a[href*="/watch?v="]') || el.querySelector('a[href*="watch?v="]');
+    const selectors = ['a[href*="/watch?v="]', 'a[href*="watch?v="]'];
+    let link = null;
+    let selectorNumber = 0;
+    for (let selectorIndex = 0; selectorIndex < selectors.length; selectorIndex++) {
+      link = el.querySelector(selectors[selectorIndex]);
+      if (link) {
+        selectorNumber = selectorIndex + 1;
+        break;
+      }
+    }
     if (!link) return null;
     try {
       const url = new URL(link.href, window.location.origin);
-      return url.searchParams.get('v');
+      return { id: url.searchParams.get('v'), selectorNumber };
     } catch (e) {
       return null;
     }
@@ -297,15 +306,15 @@
     } catch (e) {}
     const badge = document.createElement("div");
     badge.className = "tkrk-preview-overlay";
-    const previewId = getPreviewVideoId(el);
-    console.log("Adding preview badge for videoId1:", previewId);
+    const preview = getPreviewVideoId(el);
+    const previewId = preview?.id;
 
     let marker = "■";
     if (previewId) {
       marker = await getMarkerForId(previewId);
     }
 
-    badge.textContent = previewId ? `${marker} ${previewId}` : marker;
+    badge.textContent = previewId ? `(${preview.selectorNumber}) ${marker} ${previewId}` : marker;
     el.appendChild(badge);
   }
 
