@@ -281,12 +281,10 @@
   function getPreviewVideoId(el) {
     if (!el) return null;
     const link = el.querySelector('a[href*="/watch?v="]') || el.querySelector('a[href*="watch?v="]');
-
     if (!link) return null;
-    
     try {
       const url = new URL(link.href, window.location.origin);
-      return { id: url.searchParams.get('v'), selectorNumber };
+      return url.searchParams.get('v');
     } catch (e) {
       return null;
     }
@@ -300,8 +298,7 @@
     } catch (e) {}
     const badge = document.createElement("div");
     badge.className = "tkrk-preview-overlay";
-    const preview = getPreviewVideoId(el);
-    const previewId = preview?.id;
+    const previewId = getPreviewVideoId(el);
 
     let marker = "";
     if (previewId) {
