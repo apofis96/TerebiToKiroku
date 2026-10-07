@@ -88,6 +88,7 @@
   }
 
   async function getMarkerForId(id) {
+    if (!id) return '▼';
     const history = await loadHistory();
     const record = await loadRecord(id);
     const duration = Number(record?.duration || 0);
@@ -279,17 +280,10 @@
 
   function getPreviewVideoId(el) {
     if (!el) return null;
-    const selectors = ['a[href*="/watch?v="]', 'a[href*="watch?v="]'];
-    let link = null;
-    let selectorNumber = 0;
-    for (let selectorIndex = 0; selectorIndex < selectors.length; selectorIndex++) {
-      link = el.querySelector(selectors[selectorIndex]);
-      if (link) {
-        selectorNumber = selectorIndex + 1;
-        break;
-      }
-    }
+    const link = el.querySelector('a[href*="/watch?v="]') || el.querySelector('a[href*="watch?v="]');
+
     if (!link) return null;
+    
     try {
       const url = new URL(link.href, window.location.origin);
       return { id: url.searchParams.get('v'), selectorNumber };
@@ -298,7 +292,7 @@
     }
   }
 
-  async function addOverlayTo(el) {
+  async function addOverlayTo(el, selectorNumber) {
     if (!el || el.querySelector(".tkrk-preview-overlay")) return;
     try {
       const cs = window.getComputedStyle(el);
@@ -309,12 +303,12 @@
     const preview = getPreviewVideoId(el);
     const previewId = preview?.id;
 
-    let marker = "■";
+    let marker = "";
     if (previewId) {
       marker = await getMarkerForId(previewId);
     }
 
-    badge.textContent = previewId ? `(${preview.selectorNumber}) ${marker} ${previewId}` : marker;
+    badge.textContent = `(${selectorNumber}) ${marker} ${previewId}`;
     el.appendChild(badge);
   }
 
@@ -325,7 +319,7 @@
       'yt-lockup-view-model',
     ];
     const nodes = document.querySelectorAll(selectors.join(','));
-    nodes.forEach((n) => addOverlayTo(n));
+    nodes.forEach((n) => addOverlayTo(n, n.matches(selectors[0]) ? 1 : 2));
   }
 
   function startPreviewObserver() {
