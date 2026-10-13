@@ -314,6 +314,7 @@
     const selectors = [
       'yt-thumbnail-view-model',
       'yt-lockup-view-model',
+      '.ytLockupViewModelContentImage',
     ];
     const nodes = document.querySelectorAll(selectors.join(','));
     nodes.forEach((n) => addOverlayTo(n, n.matches(selectors[0]) ? 1 : 2));
