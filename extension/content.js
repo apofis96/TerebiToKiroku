@@ -280,17 +280,15 @@
 
   function getPreviewVideoId(el) {
     if (!el) return null;
-    const link = el.querySelector('a[href*="/watch?v="]') || el.querySelector('a[href*="watch?v="]');
-    if (!link) return null;
     try {
-      const url = new URL(link.href, window.location.origin);
+      const url = new URL(el.href, window.location.origin);
       return url.searchParams.get('v');
     } catch (e) {
       return null;
     }
   }
 
-  async function addOverlayTo(el, selectorNumber) {
+  async function addOverlayTo(el) {
     if (!el || el.querySelector(".tkrk-preview-overlay")) return;
     try {
       const cs = window.getComputedStyle(el);
@@ -305,19 +303,17 @@
       marker = await getMarkerForId(previewId);
     }
 
-    badge.textContent = `(${selectorNumber}) ${marker} ${previewId}`;
+    badge.textContent = `(${marker}) ${previewId}`;
     el.appendChild(badge);
   }
 
   function scanForPreviews() {
     // Common YouTube preview containers
     const selectors = [
-      'yt-thumbnail-view-model',
-      'yt-lockup-view-model',
       '.ytLockupViewModelContentImage',
     ];
     const nodes = document.querySelectorAll(selectors.join(','));
-    nodes.forEach((n) => addOverlayTo(n, n.matches(selectors[0]) ? 1 : 2));
+    nodes.forEach((n) => addOverlayTo(n));
   }
 
   function startPreviewObserver() {
