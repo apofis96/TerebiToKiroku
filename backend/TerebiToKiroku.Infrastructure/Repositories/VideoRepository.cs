@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using TerebiToKiroku.Domain.Entities;
-using TerebiToKiroku.Domain.Interfaces;
+using TerebiToKiroku.Application.Interfaces;
 using TerebiToKiroku.Infrastructure.Data;
 
 namespace TerebiToKiroku.Infrastructure.Repositories

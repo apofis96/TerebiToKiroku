@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using TerebiToKiroku.Domain.Interfaces;
+using TerebiToKiroku.Application.Interfaces;
 using TerebiToKiroku.Infrastructure.Data;
 using TerebiToKiroku.Infrastructure.Repositories;
 

@@ -1,6 +1,6 @@
 using TerebiToKiroku.Domain.Entities;
 
-namespace TerebiToKiroku.Domain.Interfaces
+namespace TerebiToKiroku.Application.Interfaces
 {
     public interface IWatchSessionRepository
     {
