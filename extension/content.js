@@ -67,8 +67,19 @@
         res([]);
         return;
       }
-      storage.get(["ytTracker_history"], (r = {}) => {
-        res(r.ytTracker_history || []);
+      storage.get(["ytTracker_history"], async (r = {}) => {
+        const storedHistory = Array.isArray(r.ytTracker_history) ? r.ytTracker_history : [];
+        const history = storedHistory.map((entry) => {
+          if (typeof entry === "string") return { id: entry, sync: false };
+          if (entry && typeof entry.id === "string" && typeof entry.sync !== "boolean") {
+            return { ...entry, sync: false };
+          }
+          return entry;
+        });
+        if (history.some((entry, index) => entry !== storedHistory[index])) {
+          await new Promise((resolve) => storage.set({ ytTracker_history: history }, resolve));
+        }
+        res(history);
       });
     });
   }
@@ -94,7 +105,7 @@
     const duration = Number(record?.duration || 0);
     const watchedSeconds = Number(record?.watchedSeconds || 0);
     const isFullyWatched = Boolean(record && duration > 0 && watchedSeconds >= duration);
-    const isInHistory = history.includes(id);
+    const isInHistory = history.some((entry) => entry.id === id);
     return isFullyWatched ? '▲' : isInHistory ? '●' : '■';
   }
 
@@ -112,8 +123,8 @@
   async function pushHistory(id) {
     const storage = getStorageArea();
     const history = await loadHistory();
-    if (!history.includes(id)) {
-      history.unshift(id);
+    if (!history.some((entry) => entry.id === id)) {
+      history.unshift({ id, sync: false });
       if (history.length > 50) history.pop();
       if (!storage) return;
       await new Promise((res) => storage.set({ ytTracker_history: history }, res));

@@ -45,6 +45,7 @@ const playbackSpeed = document.getElementById("playback-speed");
 const historyList = document.getElementById("history-list");
 const historyEmpty = document.getElementById("history-empty");
 const clearBtn = document.getElementById("clear-history");
+const manualSyncBtn = document.getElementById("manual-sync");
 
 /* ── Tabs ── */
 document.querySelectorAll(".tab").forEach((tab) => {
@@ -106,28 +107,49 @@ function getStorageArea() {
   return globalThis.chrome?.storage?.local || globalThis.browser?.storage?.local || null;
 }
 
-async function renderHistory() {
+async function loadHistory() {
   const storage = getStorageArea();
-  const history = await new Promise((r) => {
+  return new Promise((resolve) => {
     if (!storage) {
-      r([]);
+      resolve([]);
       return;
     }
-    storage.get(["ytTracker_history"], (d = {}) => r(d.ytTracker_history || []));
+    storage.get(["ytTracker_history"], async (data = {}) => {
+      const storedHistory = Array.isArray(data.ytTracker_history) ? data.ytTracker_history : [];
+      const history = storedHistory.map((entry) => {
+        if (typeof entry === "string") return { id: entry, sync: false };
+        if (entry && typeof entry.id === "string" && typeof entry.sync !== "boolean") {
+          return { ...entry, sync: false };
+        }
+        return entry;
+      });
+      if (history.some((entry, index) => entry !== storedHistory[index])) {
+        await new Promise((done) => storage.set({ ytTracker_history: history }, done));
+      }
+      resolve(history);
+    });
   });
+}
+
+async function renderHistory() {
+  const storage = getStorageArea();
+  const history = await loadHistory();
 
   if (!history.length) {
     historyEmpty.style.display = "";
     historyList.innerHTML = "";
     clearBtn.classList.add("hidden");
+    manualSyncBtn.classList.add("hidden");
     return;
   }
 
   historyEmpty.style.display = "none";
   clearBtn.classList.remove("hidden");
+  manualSyncBtn.classList.remove("hidden");
+  manualSyncBtn.disabled = history.every((entry) => entry.sync);
   historyList.innerHTML = "";
 
-  for (const id of history) {
+  for (const { id, sync } of history) {
     const rec = await new Promise((r) => {
       if (!storage) {
         r(null);
@@ -143,6 +165,7 @@ async function renderHistory() {
     li.className = "history-item";
     li.innerHTML = `
       <span class="h-icon">▶</span>
+      <span class="h-sync-dot ${sync ? "h-sync-dot-synced" : "h-sync-dot-unsynced"}" role="img" aria-label="${sync ? "Synced" : "Not synced"}" title="${sync ? "Synced" : "Not synced"}"></span>
       <div class="h-info">
         <div class="h-title">${escHtml(rec.title || "Unknown")}</div>
         <div class="h-meta">
@@ -168,16 +191,64 @@ function escHtml(s) {
 
 clearBtn.addEventListener("click", async () => {
   const storage = getStorageArea();
-  const history = await new Promise((r) => {
-    if (!storage) {
-      r([]);
-      return;
-    }
-    storage.get(["ytTracker_history"], (d = {}) => r(d.ytTracker_history || []));
-  });
-  const keys = history.map((id) => "ytTracker_" + id).concat(["ytTracker_history"]);
+  const history = await loadHistory();
+  const keys = history.map(({ id }) => "ytTracker_" + id).concat(["ytTracker_history"]);
   if (storage) storage.remove(keys, renderHistory);
   else renderHistory();
+});
+
+function mockSyncApi(entries) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.info("Mock sync API submitted history entries:", entries);
+      resolve(entries.map(({ id }) => id));
+    }, 500);
+  });
+}
+
+manualSyncBtn.addEventListener("click", async () => {
+  const storage = getStorageArea();
+  if (!storage || manualSyncBtn.disabled) return;
+
+  manualSyncBtn.disabled = true;
+  const originalLabel = manualSyncBtn.textContent;
+  manualSyncBtn.textContent = "SYNCING...";
+
+  try {
+    const history = await loadHistory();
+    const unsyncedEntries = history.filter((entry) => !entry.sync);
+    if (!unsyncedEntries.length) return;
+
+    const entriesToSubmit = await Promise.all(
+      unsyncedEntries.map(async (entry) => {
+        const record = await new Promise((resolve) => {
+          storage.get(["ytTracker_" + entry.id], (data = {}) => {
+            resolve(data["ytTracker_" + entry.id] || null);
+          });
+        });
+        return { ...entry, record };
+      })
+    );
+    const syncedIds = new Set(await mockSyncApi(entriesToSubmit));
+    const latestHistory = await loadHistory();
+    const updatedHistory = latestHistory.map((entry) =>
+      syncedIds.has(entry.id) ? { ...entry, sync: true } : entry
+    );
+
+    await new Promise((resolve) => storage.set({ ytTracker_history: updatedHistory }, resolve));
+    await renderHistory();
+    manualSyncBtn.textContent = "SYNC COMPLETE";
+  } finally {
+    if (manualSyncBtn.textContent === "SYNCING...") {
+      manualSyncBtn.textContent = originalLabel;
+      manualSyncBtn.disabled = false;
+    }
+    if (manualSyncBtn.textContent === "SYNC COMPLETE") {
+      setTimeout(() => {
+        manualSyncBtn.textContent = "MANUAL SYNC";
+      }, 1500);
+    }
+  }
 });
 
 /* ── Init: query active tab ── */
