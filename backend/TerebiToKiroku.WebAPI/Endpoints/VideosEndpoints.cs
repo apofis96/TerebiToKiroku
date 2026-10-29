@@ -19,9 +19,15 @@ namespace TerebiToKiroku.WebAPI.Endpoints
             {
                 try
                 {
-                    var command = new StartWatchVideoCommand();
+                    var command = new StartWatchVideoCommand()
+                    {
+                        Key = request.Key,
+                        Name = request.Name,
+                        Duration = request.Duration
+                    };
+
                     var response = await mediator.Send(command, cancellationToken);
-                    return Results.Ok(response);
+                    return Results.Ok(response.Id);
                 }
                 catch (ValidationException ex)
                 {
