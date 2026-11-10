@@ -1,4 +1,7 @@
-﻿namespace TerebiToKiroku.Domain.Entities
+﻿using TerebiToKiroku.Domain.Abstractions;
+using TerebiToKiroku.Domain.Rules;
+
+namespace TerebiToKiroku.Domain.Entities
 {
     public class Video : Entity
     {
@@ -22,9 +25,9 @@
             CreatedAt = DateTime.UtcNow;
         }
 
-        public static Video CreateNew(string key, string name, int duration)
+        public static Video CreateNew(string key, string name, int duration, VideoKeyMustBeUniqueRule videoUniquenessRule)
         {
-            //CheckRule(new VideoKeyMustBeUniqueRule(videoUniquenessChecker, key));
+            CheckRule(videoUniquenessRule);
 
             return new Video(key, name, duration);
         }

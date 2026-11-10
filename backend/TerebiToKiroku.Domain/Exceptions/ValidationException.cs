@@ -1,4 +1,6 @@
-﻿namespace TerebiToKiroku.Application
+﻿using TerebiToKiroku.Domain.Abstractions;
+
+namespace TerebiToKiroku.Domain.Exceptions
 {
     public sealed class ValidationException(ValidationError validationError) : Exception("Validation error")
     {

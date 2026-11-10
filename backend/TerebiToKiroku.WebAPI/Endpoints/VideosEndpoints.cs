@@ -1,7 +1,7 @@
 ﻿using Mediator;
 using Microsoft.AspNetCore.Mvc;
-using TerebiToKiroku.Application;
 using TerebiToKiroku.Application.Videos.StartWatchVideo;
+using TerebiToKiroku.Domain.Exceptions;
 
 namespace TerebiToKiroku.WebAPI.Endpoints
 {

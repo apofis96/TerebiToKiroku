@@ -1,4 +1,6 @@
 ﻿using Mediator;
+using TerebiToKiroku.Application.Interfaces;
+using TerebiToKiroku.Domain.Exceptions;
 
 namespace TerebiToKiroku.Application.Pipeline
 {

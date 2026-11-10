@@ -1,4 +1,6 @@
-﻿namespace TerebiToKiroku.Domain.Entities
+﻿using TerebiToKiroku.Domain.Abstractions;
+
+namespace TerebiToKiroku.Domain.Entities
 {
     public class WatchSession : Entity
     {

@@ -1,7 +1,8 @@
 ﻿using Mediator;
 using System.Diagnostics.CodeAnalysis;
+using TerebiToKiroku.Domain.Abstractions;
 
-namespace TerebiToKiroku.Application
+namespace TerebiToKiroku.Application.Interfaces
 {
     public interface IValidate : IMessage
     {

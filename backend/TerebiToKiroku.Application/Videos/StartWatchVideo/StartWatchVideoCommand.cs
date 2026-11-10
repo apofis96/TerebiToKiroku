@@ -1,5 +1,7 @@
 ﻿using Mediator;
 using System.Diagnostics.CodeAnalysis;
+using TerebiToKiroku.Application.Interfaces;
+using TerebiToKiroku.Domain.Abstractions;
 using TerebiToKiroku.Domain.Entities;
 
 namespace TerebiToKiroku.Application.Videos.StartWatchVideo
