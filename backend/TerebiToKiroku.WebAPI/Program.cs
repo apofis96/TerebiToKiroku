@@ -29,6 +29,7 @@ namespace TerebiToKiroku.WebAPI
             var app = builder.Build();
 
             app.MapVideosEndpoints();
+            app.MapWatchSessionsEndpoints();
 
             app.Run();
         }

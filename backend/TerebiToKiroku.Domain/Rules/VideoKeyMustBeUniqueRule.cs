@@ -1,10 +1,8 @@
-﻿
-using TerebiToKiroku.Domain.Abstractions;
+﻿using TerebiToKiroku.Domain.Abstractions;
 
 namespace TerebiToKiroku.Domain.Rules
 {
-    public sealed class VideoKeyMustBeUniqueRule(
-    bool isUnique) : IBusinessRule
+    public sealed class VideoKeyMustBeUniqueRule(bool isUnique) : IBusinessRule
     {
         public bool IsBroken => !isUnique;
 

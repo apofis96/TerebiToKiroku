@@ -10,11 +10,6 @@ namespace TerebiToKiroku.WebAPI.Endpoints
         public static void MapVideosEndpoints(this WebApplication app)
         {
             var videosApi = app.MapGroup("/videos").RequireAuthorization();
-            videosApi.MapGet("/", async (IMediator mediator, CancellationToken cancellationToken) =>
-            {
-                return Results.Ok();
-            }).WithName("Get Videos");
-
             videosApi.MapPost("/start-watch", async ([FromBody] StartWatchVideoRequest request, IMediator mediator, CancellationToken cancellationToken) =>
             {
                 try
@@ -32,6 +27,10 @@ namespace TerebiToKiroku.WebAPI.Endpoints
                 catch (ValidationException ex)
                 {
                     return Results.BadRequest(ex.ValidationError);
+                }
+                catch (BusinessRuleValidationException ex)
+                {
+                    return Results.BadRequest(ex.BrokenRule);
                 }
             }).WithName("Start Watch Video");
         }

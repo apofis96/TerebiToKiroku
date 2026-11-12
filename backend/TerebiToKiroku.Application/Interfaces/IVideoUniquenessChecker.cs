@@ -2,8 +2,6 @@
 {
     public interface IVideoUniquenessChecker
     {
-        Task<bool> IsUniqueAsync(
-            string key,
-            CancellationToken cancellationToken);
+        Task<bool> IsUniqueAsync(string key, CancellationToken cancellationToken);
     }
 }

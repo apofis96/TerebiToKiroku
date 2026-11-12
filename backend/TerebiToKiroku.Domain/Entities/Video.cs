@@ -7,7 +7,7 @@ namespace TerebiToKiroku.Domain.Entities
     {
         public string Name { get; set; }
 
-        public string Key { get; set; }
+        public required string Key { get; set; }
 
         public int Duration { get; set; }
 
