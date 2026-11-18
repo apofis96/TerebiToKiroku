@@ -15,13 +15,12 @@ namespace TerebiToKiroku.Domain.Entities
 
         public Video() { }
 
-        private Video(string key, string name, int duration)
+        private Video(string name, int duration)
         {
             Id = Guid.NewGuid();
-            Key = key;
             Name = name;
             Duration = duration;
-            WatchSessions = new List<WatchSession>();
+            WatchSessions = [];
             CreatedAt = DateTime.UtcNow;
         }
 
@@ -29,7 +28,7 @@ namespace TerebiToKiroku.Domain.Entities
         {
             CheckRule(videoUniquenessRule);
 
-            return new Video(key, name, duration);
+            return new Video(name, duration) { Key = key };
         }
     }
 }

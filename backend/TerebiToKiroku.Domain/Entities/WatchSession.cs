@@ -23,7 +23,7 @@ namespace TerebiToKiroku.Domain.Entities
         {
             CheckRule(videoExistenceRule);
 
-            return new WatchSession(sessionDuration, watchedDuration);
+            return new WatchSession(sessionDuration, watchedDuration) { Key = key };
         }
     }
 }
